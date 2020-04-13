@@ -1,22 +1,50 @@
 class Player {
   constructor() {
     this.turnSpeed = 0.05
-    //hey background
-    //hey backgro dsdund
+    this.maxSpeed = 10
+    this.torque = 0
+
+    this.accelerating = false;
+
     this.pos = createVector(gameWidth/2, gameHeight/2);
     this.velocity = createVector(0, 0);
     this.acceleration = createVector(0, 0);
-    this.rotation = 0
+
+    this.angle = 0;
+  }
+
+  update() {
+    this.move();
   }
 
   move() {
 
+    if (this.accelerating) {
+      console.log("accelerating")
+      this.acceleration = p5.Vector.fromAngle(this.angle);
+      this.acceleration.setMag(.1);
+    } else {
+      this.acceleration.setMag(0);
+    }
+
+    this.velocity.add(this.acceleration);
+    this.velocity.limit(this.maxSpeed);
+
+    console.log(this.velocity)
+
+    this.pos.add(this.velocity);
+
+    this.angle += this.torque;
   }
 
   show() {
+
     push();
 
-    translate(this.pos.x, this.pos.y)
+    translate(this.pos.x, this.pos.y);
+    rotate(this.angle);
+
+
     fill(0);
     noStroke();
 
@@ -31,11 +59,7 @@ class Player {
     stroke(255);
 
     pop();
-    // beginShape(TRIANGLES);
-    // vertex(-10, 15);
-    // vertex(0, -15);
-    // vertex(10, 15);
-    // endShape();
+
   }
 
   // function move() {

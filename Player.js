@@ -1,82 +1,72 @@
-class Player {
-  constructor() {
-    this.turnSpeed = 0.05
-    this.maxSpeed = 10
-    this.torque = 0
+var size = 10;
+var turnSpeed = 0.05;
+var maxSpeed = 10;
+var accelerationPower = 0.15;
+var turnDegrees = 3;
 
+class Player {
+
+  constructor() {
+    this.spin = 0;
+    this.angle = 0;
     this.accelerating = false;
 
-    this.pos = createVector(gameWidth/2, gameHeight/2);
-    this.velocity = createVector(0, 0);
-    this.acceleration = createVector(0, 0);
+    this.spaceship = createSprite(gameWidth/2, gameHeight/2);
+    this.spaceship.limitSpeed(maxSpeed);
+    this.spaceship.friction = 0.01;
 
-    this.angle = 0;
+    this.spaceship.draw = function() {
+      push();
+
+      fill(0);
+
+      beginShape();
+      vertex(-size, -size);
+      vertex(-size, size);
+      vertex(2*size, 0);
+      endShape(CLOSE);
+
+      pop();
+    }
   }
 
+  // Called every frame by runner class
   update() {
-    this.move();
+    this.updateMovement();
+    this.show();
   }
 
-  move() {
-
+  // Manages acceleration and rotation of spaceship
+  updateMovement() {
     if (this.accelerating) {
-      console.log("accelerating")
-      this.acceleration = p5.Vector.fromAngle(this.angle);
-      this.acceleration.setMag(.1);
-    } else {
-      this.acceleration.setMag(0);
+      this.spaceship.addSpeed(accelerationPower, this.spaceship.rotation);
     }
 
-    this.velocity.add(this.acceleration);
-    this.velocity.limit(this.maxSpeed);
+    this.spaceship.rotation += this.spin;
 
-    console.log(this.velocity)
-
-    this.pos.add(this.velocity);
-
-    this.angle += this.torque;
+    // Implements bouncing off the walls
+    if (this.spaceship.position.x < 0) {
+      this.spaceship.position.x = 1;
+      this.spaceship.velocity.x = -this.spaceship.velocity.x;
+      this.spaceship.setSpeed(0.7 * this.spaceship.getSpeed()); //slows it down a bit
+    } else if (this.spaceship.position.x > width) {
+      this.spaceship.position.x = width - 1;
+      this.spaceship.velocity.x = -this.spaceship.velocity.x;
+      this.spaceship.setSpeed(0.7 * this.spaceship.getSpeed());
+    }
+    if (this.spaceship.position.y < 0) {
+      this.spaceship.position.y = 1;
+      this.spaceship.velocity.y = -this.spaceship.velocity.y;
+      this.spaceship.setSpeed(0.7 * this.spaceship.getSpeed());
+    } else if (this.spaceship.position.y > height) {
+      this.spaceship.position.y = height - 1;
+      this.spaceship.velocity.y = -this.spaceship.velocity.y;
+      this.spaceship.setSpeed(0.7 * this.spaceship.getSpeed());
+    }
   }
 
+  // Displays sprite on screen
   show() {
-
-    push();
-
-    translate(this.pos.x, this.pos.y);
-    rotate(this.angle);
-
-
-    fill(0);
-    noStroke();
-
-    var size = 12;
-
-    beginShape();
-
-    vertex(-size-2, -size);
-    vertex(-size-2, size);
-    vertex(2 * size - 2, 0);
-    endShape(CLOSE);
-    stroke(255);
-
-    pop();
-
+    drawSprite(this.spaceship);
   }
-
-  // function move() {
-  //   self.angle = self.angle + (self.right - self.left)*self.turnSpeed
-  //   self.velocity += 0.1*(self.up - self.down)
-  //
-  //   self.body.rotate((self.right - self.left)*self.turnSpeed)
-  //   self.x = self.x + sin(self.angle)*self.velocity
-  //   self.y = self.y - cos(self.angle)*self.velocity
-  //
-  //   if self.velocity > 10 {
-  //       self.velocity = 10
-  //   }
-  //   if self.velocity < 1 {
-  //       self.velocity = 1
-  //   }
-  //
-  //   print(self.velocity)
-  // }
 }

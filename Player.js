@@ -28,12 +28,21 @@ class Player {
 
       pop();
     }
+
+    this.asteroidsList = [];
+    this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 1));
+    this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 2));
+    this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 1));
   }
 
   // Called every frame by runner class
   update() {
     this.updateMovement();
     this.show();
+
+    for (let a of this.asteroidsList) {
+      a.update();
+    };
   }
 
   // Manages acceleration and rotation of spaceship

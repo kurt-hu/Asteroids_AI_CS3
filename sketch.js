@@ -23,6 +23,8 @@ function keyPressed() {
         player.spin += -turnDegrees;
     if (keyCode == RIGHT_ARROW)
         player.spin += turnDegrees;
+    if (keyCode == SHIFT)
+        player.shoot();
 }
 
 function keyReleased() {

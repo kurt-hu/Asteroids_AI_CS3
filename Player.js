@@ -8,7 +8,6 @@ class Player {
 
   constructor() {
     this.spin = 0;
-    this.angle = 0;
     this.accelerating = false;
 
     this.spaceship = createSprite(gameWidth/2, gameHeight/2);
@@ -29,17 +28,24 @@ class Player {
       pop();
     }
 
+    this.bulletList = []
     this.asteroidsList = [];
     this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 1));
     this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 2));
     this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 1));
   }
 
+  shoot () {
+    this.bulletList.push(new Bullet(this.spaceship.x, this.spaceship.y, this.spaceship.rotation));
+  }
+
   // Called every frame by runner class
   update() {
     this.updateMovement();
     this.show();
-
+    for (let a of this.bulletList) {
+      a.update();
+    };
     for (let a of this.asteroidsList) {
       a.update();
     };

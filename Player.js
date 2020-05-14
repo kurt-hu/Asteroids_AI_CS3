@@ -3,12 +3,12 @@ var turnSpeed = 0.05;
 var maxSpeed = 10;
 var accelerationPower = 0.15;
 var turnDegrees = 3;
+
 class Player {
 
   constructor() {
     this.spin = 0;
     this.accelerating = false;
-    this.slowing = false;
 
     this.spaceship = createSprite(gameWidth/2, gameHeight/2);
     this.spaceship.limitSpeed(maxSpeed);
@@ -28,26 +28,38 @@ class Player {
       pop();
     }
 
-    this.bulletList = []
+    this.spaceship.setCollider("rectangle", 0, 0, size, 2*size)
+
+    this.bulletList = [];
+
+
     this.asteroidsList = [];
     this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 1));
     this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 2));
     this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 1));
+    this.asteroidsList.push(new Asteroid(random(width), random(height), 0, 0, 1));
   }
 
-  shoot () {
-    this.bulletList.push(new Bullet(this.spaceship.x, this.spaceship.y, this.spaceship.rotation));
+  shoot() {
+    this.bulletList.push(new Bullet(this.spaceship.position.x, this.spaceship.position.y, this.spaceship.rotation));
   }
 
   // Called every frame by runner class
   update() {
     this.updateMovement();
     this.show();
-    for (let a of this.bulletList) {
-      a.update();
-    };
+    for (let i = 0; i < this.bulletList.length; i++) {
+      if (this.bulletList[i].inBounds()) {
+        this.bulletList[i].update();
+      } else {
+        this.bulletList.splice(i, 1);
+      }
+    }
     for (let a of this.asteroidsList) {
       a.update();
+      if (this.spaceship.overlap(a.asteroid)) {
+        print("collision")
+      }
     };
   }
 
@@ -56,11 +68,6 @@ class Player {
     if (this.accelerating) {
       this.spaceship.addSpeed(accelerationPower, this.spaceship.rotation);
     }
-    if (this.slowing) {
-      this.spaceship.friction += .001;
-    }
-    else if (this.spaceship.friction != .01)
-      this.spaceship.friction = .01;
 
     this.spaceship.rotation += this.spin;
 

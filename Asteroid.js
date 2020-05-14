@@ -54,6 +54,7 @@ class Asteroid {
         }
         break;
     }
+    this.asteroid.setCollider("circle", 0, 0, this.radius);
   }
 
   //This method is the one that is actually called by the Player class
@@ -67,10 +68,7 @@ class Asteroid {
     && this.asteroid.position.x + this.radius > this.spaceship.position.x - 5) {
       if (this.asteroid.position.y + this.radius < this.spaceship.position.y + 5
       && this.asteroid.position.y + this.radius > this.spaceship.position.y - 5){
-        this.spaceship.position.x = width - 1;
         this.spaceship.velocity.x = -this.spaceship.velocity.x;
-        this.spaceship.setSpeed(0.7 * this.spaceship.getSpeed());
-        this.spaceship.position.y = height - 1;
         this.spaceship.velocity.y = -this.spaceship.velocity.y;
         this.spaceship.setSpeed(0.7 * this.spaceship.getSpeed());
       }

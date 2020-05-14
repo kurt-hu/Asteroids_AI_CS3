@@ -23,10 +23,8 @@ function keyPressed() {
         player.spin += -turnDegrees;
     if (keyCode == RIGHT_ARROW)
         player.spin += turnDegrees;
-    if (keyCode == SHIFT)
+    if (key == ' ') //TODO: Make bullet freq limited to 2/sec or something
         player.shoot();
-    if (keyCode == DOWN_ARROW)
-        player.slowing = true;
 }
 
 function keyReleased() {
@@ -36,6 +34,4 @@ function keyReleased() {
         player.spin -= -turnDegrees;
     if (keyCode == RIGHT_ARROW)
         player.spin -= turnDegrees;
-    if (keyCode == DOWN_ARROW)
-        player.slowing = false;
 }

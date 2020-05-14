@@ -3,12 +3,12 @@ var turnSpeed = 0.05;
 var maxSpeed = 10;
 var accelerationPower = 0.15;
 var turnDegrees = 3;
-
 class Player {
 
   constructor() {
     this.spin = 0;
     this.accelerating = false;
+    this.slowing = false;
 
     this.spaceship = createSprite(gameWidth/2, gameHeight/2);
     this.spaceship.limitSpeed(maxSpeed);
@@ -56,6 +56,11 @@ class Player {
     if (this.accelerating) {
       this.spaceship.addSpeed(accelerationPower, this.spaceship.rotation);
     }
+    if (this.slowing) {
+      this.spaceship.friction += .001;
+    }
+    else if (this.spaceship.friction != .01)
+      this.spaceship.friction = .01;
 
     this.spaceship.rotation += this.spin;
 
@@ -83,5 +88,6 @@ class Player {
   // Displays sprite on screen
   show() {
     drawSprite(this.spaceship);
+
   }
 }

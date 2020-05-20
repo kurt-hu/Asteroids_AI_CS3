@@ -1,7 +1,9 @@
 var player;
+var framesAfterShot = 0;
 
 var gameWidth = 800;
 var gameHeight = 800;
+var isSpaceDown
 
 // Called once during runtime
 function setup() {
@@ -13,6 +15,12 @@ function setup() {
 function draw() {
   background(150);
 
+  framesAfterShot++;
+  if (isSpaceDown == true && framesAfterShot > 20) {
+      framesAfterShot = 0;
+      player.shoot();
+  }
+
   player.update();
 }
 
@@ -23,8 +31,9 @@ function keyPressed() {
         player.spin += -turnDegrees;
     if (keyCode == RIGHT_ARROW)
         player.spin += turnDegrees;
-    if (key == ' ') //TODO: Make bullet freq limited to 2/sec or something
-        player.shoot();
+    if (key == ' ') {
+        isSpaceDown = true;
+    }
 }
 
 function keyReleased() {
@@ -34,4 +43,7 @@ function keyReleased() {
         player.spin -= -turnDegrees;
     if (keyCode == RIGHT_ARROW)
         player.spin -= turnDegrees;
+    if (key == ' ')
+      isSpaceDown = false;
+
 }

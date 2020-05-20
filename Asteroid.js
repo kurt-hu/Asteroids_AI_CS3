@@ -60,20 +60,9 @@ class Asteroid {
   //This method is the one that is actually called by the Player class
   update() {
     this.updateMovement();
-    //this.checkCollisiton();
     this.show();
   }
-  checkCollision() {
-    if (this.asteroid.position.x + this.radius < this.spaceship.position.x + 5
-    && this.asteroid.position.x + this.radius > this.spaceship.position.x - 5) {
-      if (this.asteroid.position.y + this.radius < this.spaceship.position.y + 5
-      && this.asteroid.position.y + this.radius > this.spaceship.position.y - 5){
-        this.spaceship.velocity.x = -this.spaceship.velocity.x;
-        this.spaceship.velocity.y = -this.spaceship.velocity.y;
-        this.spaceship.setSpeed(0.7 * this.spaceship.getSpeed());
-      }
-    }
-  }
+
   updateMovement() {
     //Checks if out of bounds
     if (this.asteroid.position.x + this.radius < 0) {

@@ -2,13 +2,14 @@ var bulletSize = 10;
 
 class Bullet {
 
-  constructor(startingX, startingY, startingRotation) {
+  constructor(startingX, startingY, startingRotation, startingXvelocity = 0, startingYvelocity = 0) {
     this.spin = 0;
 
     this.bullet = createSprite(startingX, startingY);
     this.bullet.accelerating = false;
     this.bullet.rotation = startingRotation;
-    this.bullet.setVelocity(10*cos(radians(startingRotation)), 10*sin(radians(startingRotation)));
+    this.bullet.setVelocity(10*cos(radians(startingRotation)) + startingXvelocity,
+      10*sin(radians(startingRotation)) + startingYvelocity);
 
     this.bullet.draw = function() {
         push();
@@ -22,10 +23,11 @@ class Bullet {
         endShape(CLOSE);
         pop();
       }
+
+      this.bullet.setCollider("circle", 0, 0, bulletSize);
   }
 
   update() {
-    print("updating");
     this.updateMovement();
     this.show();
   }

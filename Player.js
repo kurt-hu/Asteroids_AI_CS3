@@ -2,8 +2,7 @@ var size = 10;
 var turnSpeed = 0.05;
 var maxSpeed = 10;
 var accelerationPower = 0.15;
-var turnDegrees = 3;
-
+var turnDegrees = 5;
 class Player {
 
   constructor() {
@@ -14,10 +13,15 @@ class Player {
     this.spaceship.limitSpeed(maxSpeed);
     this.spaceship.friction = 0.01;
 
+    score = 0;
+    framesAfterAsteroidCap = 600;
+    framesAfterAsteroid = 0;
+    framesAfterShot = 0;
+
     this.spaceship.draw = function() {
       push();
 
-      fill(0);
+      fill(255);
 
       beginShape();
       vertex(-size, -size);
@@ -34,10 +38,10 @@ class Player {
 
 
     this.asteroidsList = [];
-    this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 1));
-    this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 2));
-    this.asteroidsList.push(new Asteroid(random(width), random(height), random(-2, 2), random(-2, 2), 1));
-    this.asteroidsList.push(new Asteroid(random(width), random(height), 0, 0, 1));
+    this.spawnNewRandomAsteroid();
+    this.spawnNewRandomAsteroid();
+    this.spawnNewRandomAsteroid();
+    this.spawnNewRandomAsteroid();
 
   }
 
@@ -50,27 +54,67 @@ class Player {
                                     this.spaceship.velocity.x, this.spaceship.velocity.y));
   }
 
+  spawnNewRandomAsteroid() {
+    let x;
+    let y;
+    if (random() > 0.5) {
+      x = int(random(2)) * gameWidth;
+      y = random(gameHeight);
+    } else {
+      y = int(random(2)) * gameHeight;
+      x = random(gameWidth);
+    }
+    this.asteroidsList.push(new Asteroid(x, y, random(-3, 3), random(-3, 3), 1));
+  }
+
   // Called every frame by runner class
   update() {
     this.updateMovement();
+    score++;
 
     for (let a of this.asteroidsList) {
       a.update();
       if (this.spaceship.overlap(a.asteroid)) {
         //TODO: Add collision code
-
+        isGameOver = true;
+        print("Game over!")
       }
     };
+
+    var xVel1;
+    var xVel2;
+    var yVel1;
+    var yVel2;
+
 
     for (let i = 0; i < this.bulletList.length; i++) {
       for (let j = 0; j < this.asteroidsList.length; j++) {
         if (this.asteroidsList[j].asteroid.overlap(this.bulletList[i].bullet)) {
           //TODO: Add collision code
-          print("Hit asteroid")
+          score += 100;
+          if (this.asteroidsList[j].radius == bigAsteroidRadius) {
+            xVel1 = this.asteroidsList[j].asteroid.velocity.x - 1;
+            xVel2 = this.asteroidsList[j].asteroid.velocity.x + 1;
+            yVel1 = this.asteroidsList[j].asteroid.velocity.y - 1;
+            yVel2 = this.asteroidsList[j].asteroid.velocity.y + 1;
+            this.asteroidsList.push(new Asteroid(this.asteroidsList[j].asteroid.position.x,
+                                    this.asteroidsList[j].asteroid.position.y, xVel1, yVel1, 2));
+            this.asteroidsList.push(new Asteroid(this.asteroidsList[j].asteroid.position.x,
+                                    this.asteroidsList[j].asteroid.position.y, xVel2, yVel2, 2));
+          }
 
+          //gotta get rid of the bullet before it can hit the small asteroids
+          this.bulletList.splice(i, 1);
+          this.asteroidsList.splice(j, 1);
+
+          //this is a little weird but it doesn't work without the break, also makes it faster
+          break;
         }
       }
+    }
 
+    //separating for loops for the sake of readability
+    for (let i = 0; i < this.bulletList.length; i++) {
       if (this.bulletList[i].inBounds()) {
         this.bulletList[i].update();
       } else {
@@ -79,6 +123,10 @@ class Player {
     }
 
     this.show();
+
+    textSize(30);
+    fill(50, 200, 50);
+    text("Score: " + score, 10, 30);
   }
 
   // Manages acceleration and rotation of spaceship

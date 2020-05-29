@@ -1,4 +1,5 @@
-var radius = 30;
+var bigAsteroidRadius = 50;
+var smallAsteroidRadius = 30;
 
 class Asteroid {
 
@@ -10,19 +11,18 @@ class Asteroid {
       //Draw function looks redundant but is called before radius can be
       //instantiated, so we have to hard code it
       case 1: //big asteroid
-        this.radius = 30;
+        this.radius = bigAsteroidRadius;
 
         this.asteroid.draw = function() {
           let angle = TWO_PI / 12;
 
           push();
           // noFill();
-          fill(200, 0, 0);
-          stroke(255);
+          fill(125);
           beginShape();
 
           for (let a = 0; a < TWO_PI; a += angle) {
-            vertex(cos(a) * 30, sin(a) * 30);
+            vertex(cos(a) * bigAsteroidRadius, sin(a) * bigAsteroidRadius);
           }
 
           // circle(0, 0, 30);
@@ -32,19 +32,18 @@ class Asteroid {
         }
         break;
       case 2: //smaller asteroid
-        this.radius = 15;
+        this.radius = smallAsteroidRadius;
 
         this.asteroid.draw = function() {
           let angle = TWO_PI / 12;
 
           push();
           // noFill();
-          fill(200, 0, 0);
-          stroke(255);
+          fill(125);
           beginShape();
 
           for (let a = 0; a < TWO_PI; a += angle) {
-            vertex(cos(a) * 15, sin(a) * 15);
+            vertex(cos(a) * smallAsteroidRadius, sin(a) * smallAsteroidRadius);
           }
 
           // circle(0, 0, 30);

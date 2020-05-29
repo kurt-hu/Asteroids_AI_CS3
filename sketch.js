@@ -1,4 +1,5 @@
 var player;
+var framesAfterShot = 0;
 var framesAfterAsteroid = 0;
 var framesAfterAsteroidCap = 600;
 

@@ -8,8 +8,8 @@ class Bullet {
     this.bullet = createSprite(startingX, startingY);
     this.bullet.accelerating = false;
     this.bullet.rotation = startingRotation;
-    this.bullet.setVelocity(10*cos(radians(startingRotation)) + startingXvelocity,
-      10*sin(radians(startingRotation)) + startingYvelocity);
+    this.bullet.setVelocity(30*cos(radians(startingRotation)) + startingXvelocity,
+      30*sin(radians(startingRotation)) + startingYvelocity);
 
     this.bullet.draw = function() {
         push();

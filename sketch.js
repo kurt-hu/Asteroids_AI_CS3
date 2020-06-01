@@ -1,11 +1,7 @@
 var player;
-var framesAfterShot = 0;
-var framesAfterAsteroid = 0;
-var framesAfterAsteroidCap = 600;
 
 var gameWidth = 800;
 var gameHeight = 800;
-var isSpaceDown;
 var isGameOver = false;
 var score = 0;
 
@@ -18,25 +14,11 @@ function setup() {
 // Called every frame
 function draw() {
   background(0);
-
   if (!isGameOver) {
-    framesAfterShot++;
-    if (isSpaceDown == true && framesAfterShot > 20) {
-        framesAfterShot = 0;
-        player.shoot();
-    }
-
-    framesAfterAsteroid++;
-    if (framesAfterAsteroid > framesAfterAsteroidCap) {
-      player.spawnNewRandomAsteroid();
-      framesAfterAsteroid = 0;
-      if(framesAfterAsteroidCap > 90) {
-        framesAfterAsteroidCap *= .9;
-      }
-    }
-
     player.update();
-  } else {
+  }
+
+  if (isGameOver){
     textSize(32);
     textAlign(CENTER);
     fill(250, 50, 50);
@@ -54,11 +36,16 @@ function keyPressed() {
     if (keyCode == RIGHT_ARROW)
         player.spin += turnDegrees;
     if (key == ' ') {
-        isSpaceDown = true;
+        player.shoot();
     }
     if (keyCode == ENTER && isGameOver) {
         isGameOver = false;
         player = new Player();
+    }
+    if (key == 'b') {
+      for (let i = 0; i < player.vision.length; i++) {
+        print(player.vision[i]);
+      }
     }
 }
 
@@ -69,7 +56,4 @@ function keyReleased() {
         player.spin -= -turnDegrees;
     if (keyCode == RIGHT_ARROW)
         player.spin -= turnDegrees;
-    if (key == ' ')
-      isSpaceDown = false;
-
 }

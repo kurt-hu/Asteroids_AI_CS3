@@ -3,20 +3,22 @@ var turnSpeed = 0.05;
 var maxSpeed = 10;
 var accelerationPower = 0.15;
 var turnDegrees = 5;
+var lagReducer = 10; //Higher means less lag, more possible errors
 class Player {
-
   constructor() {
+    this.isDead = false;
     this.spin = 0;
     this.accelerating = false;
+    this.vision = new Array(9) ;
 
     this.spaceship = createSprite(gameWidth/2, gameHeight/2);
     this.spaceship.limitSpeed(maxSpeed);
     this.spaceship.friction = 0.01;
 
     score = 0;
-    framesAfterAsteroidCap = 600;
-    framesAfterAsteroid = 0;
-    framesAfterShot = 0;
+    this.framesAfterAsteroidCap = 600;
+    this.framesAfterAsteroid = 0;
+    this.framesAfterShot = 0;
 
     this.spaceship.draw = function() {
       push();
@@ -46,12 +48,15 @@ class Player {
   }
 
   shoot() {
-    //By default, clockwise is positive, so we gotta do a reverse, but y is also backwards (positive is down),
-    // so the two negatives cancel each other out, so we can just use the original this.spaceship.rotation value
-    this.bulletStartX = this.spaceship.position.x + size * cos(radians(this.spaceship.rotation));
-    this.bulletStartY = this.spaceship.position.y + size * sin(radians(this.spaceship.rotation));
-    this.bulletList.push(new Bullet(this.bulletStartX, this.bulletStartY, this.spaceship.rotation,
-                                    this.spaceship.velocity.x, this.spaceship.velocity.y));
+    if (this.framesAfterShot > 20) {
+      //By default, clockwise is positive, so we gotta do a reverse, but y is also backwards (positive is down),
+      // so the two negatives cancel each other out, so we can just use the original this.spaceship.rotation value
+      this.bulletStartX = this.spaceship.position.x + size * cos(radians(this.spaceship.rotation));
+      this.bulletStartY = this.spaceship.position.y + size * sin(radians(this.spaceship.rotation));
+      this.bulletList.push(new Bullet(this.bulletStartX, this.bulletStartY, this.spaceship.rotation,
+                                      this.spaceship.velocity.x, this.spaceship.velocity.y));
+      this.framesAfterShot = 0;
+    }
   }
 
   spawnNewRandomAsteroid() {
@@ -69,13 +74,16 @@ class Player {
 
   // Called every frame by runner class
   update() {
+    this.checkTimers();
     this.updateMovement();
     score++;
+    this.look();
 
     for (let a of this.asteroidsList) {
       a.update();
       if (this.spaceship.overlap(a.asteroid)) {
         //TODO: Add collision code
+        this.isDead = true;
         isGameOver = true;
         print("Game over!")
       }
@@ -155,6 +163,65 @@ class Player {
       this.spaceship.position.y = height - 1;
       this.spaceship.velocity.y = -this.spaceship.velocity.y;
       this.spaceship.setSpeed(0.7 * this.spaceship.getSpeed());
+    }
+  }
+
+  look() {
+    let x;
+    let y;
+    for (let i = 0; i < this.vision.length; i++){
+        x = lagReducer * cos(i * PI / 4 + radians(this.spaceship.rotation));
+        y = lagReducer * sin(i * PI / 4 + radians(this.spaceship.rotation));
+        this.vision[i] = this.lookInDirection(x, y);//consider increasing x and y by a factor if laggy
+    }
+    if(this.vision[8] != 0)//CB has canShoot as well - A
+    {
+      this.vision[8] = 1;
+    }
+    else {
+      this.vision[8] = 0;
+    }
+  }
+
+  lookInDirection(dX, dY) {
+    let x = this.spaceship.position.x;
+    let y = this.spaceship.position.y;
+    let i = 1;
+    while (abs(x-gameWidth/2) < gameWidth/2 && abs(y-gameHeight/2) < gameHeight/2) {
+      //condition is that the coordinate is within the bounds
+      x += dX;
+      y += dY;
+
+      //If you uncomment this it'll display the vision of the spaceship
+      // stroke(255);
+      // circle(x, y, 2);
+
+      if(this.isAsteroidHere(x, y)){
+        return i;
+      }
+      i += lagReducer;
+    }
+    return 0;
+  }
+
+  isAsteroidHere(x, y) {
+    for (let a of this.asteroidsList) {
+      if(a.asteroid.overlapPoint(x,y))
+        return true;
+    }
+    return false;
+  }
+
+  checkTimers() {
+    this.framesAfterShot++;
+    this.framesAfterAsteroid++;
+
+    if (this.framesAfterAsteroid > this.framesAfterAsteroidCap) {
+      this.spawnNewRandomAsteroid();
+      this.framesAfterAsteroid = 0;
+      if(this.framesAfterAsteroidCap > 90) {
+        this.framesAfterAsteroidCap *= .9;
+      }
     }
   }
 

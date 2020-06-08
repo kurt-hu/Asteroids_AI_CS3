@@ -2,33 +2,47 @@ class Population {
 
   constructor(size) {
     this.players = new Array(size);
-    for (let i = 0; i < players.length; i++) {
-      players[i] = new Player();
+    for (let i = 0; i < this.players.length; i++) {
+      this.players[i] = new Player();
     }
 
     this.generation = 0;
+    this.bestScore = 0;
     this.bestPlayerIndex;
     this.bestPlayer;
-    this.bestScore;
+    this.bestFitness;
+
+    this.highScore = 0;
   }
 
   updateAlive() {
 
     for (let i = 0; i < this.players.length; i++) {
-      if (!this.players[i].dead) {
+      if (!this.players[i].isDead) {
         this.players[i].look();//get inputs for brain
         this.players[i].think();//use outputs from neural network
         this.players[i].update();//move the player according to the outputs from the neural network
-        if (!showBest || i ==0) {//dont show dead players
+      }
+    }
+
+    if (!showOneFromPop) {
+      for (let i = 0; i < this.players.length; i++) {
+        this.players[i].show();
+      }
+    } else {
+      for (let i = 0; i < this.players.length; i++) {
+        if (!this.players[i].isDead) {
           this.players[i].show();
+          break;
         }
       }
     }
+
   }
 
   setBestPlayer() {
     //get max fitness
-    let max =0;
+    let max = 0;
     let maxIndex = 0;
     for (let i = 0; i < this.players.length; i++) {
       if (this.players[i].fitness > max) {
@@ -56,23 +70,28 @@ class Population {
   }
 
   naturalSelection() {
-    let newPlayers = new Array(players.length);//Create new players array for the next generation
+    let newPlayers = new Array(this.players.length);//Create new players array for the next generation
 
-    setBestPlayer();//set which player is the best
+    this.setBestPlayer();//set which player is the best
 
     newPlayers[0] = this.players[this.bestPlayerIndex].cloneForReplay();//add the best player of this generation to the next generation without mutation
     for (let i = 1; i < this.players.length; i++) {
       //for each remaining spot in the next generation
       if (i < this.players.length/2) {
-        newPlayers[i] = selectPlayer().clone();//select a random player(based on fitness) and clone it
+        newPlayers[i] = this.selectPlayer().clone();//select a random player(based on fitness) and clone it
       }
       else {
-        newPlayers[i] = selectPlayer().crossover(selectPlayer());
+        newPlayers[i] = this.selectPlayer().crossover(this.selectPlayer());
       }
       newPlayers[i].mutate(); //mutate it
     }
 
-    this.players = newPlayers.clone();
+    // this.players = newPlayers.clone();
+
+    //This isn't a deep copy like .clone() but I think it works
+    this.players = null;
+    this.players = newPlayers.slice();
+
     this.generation += 1;
   }
 

@@ -59,7 +59,7 @@ class Asteroid {
   //This method is the one that is actually called by the Player class
   update() {
     this.updateMovement();
-    this.show();
+    // this.show();
   }
 
   updateMovement() {

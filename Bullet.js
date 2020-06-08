@@ -29,7 +29,7 @@ class Bullet {
 
   update() {
     this.updateMovement();
-    this.show();
+    // this.show();
   }
 
   updateMovement() {

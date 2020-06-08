@@ -4,21 +4,30 @@ var maxSpeed = 10;
 var accelerationPower = 0.15;
 var turnDegrees = 5;
 var lagReducer = 10; //Higher means less lag, more possible errors
+
 class Player {
-  constructor() {
+  constructor(seed = floor(random(1000000000))) {
+    this.score = 0;
+    this.fitness;
+    this.shotsFired = 0;
+    this.shotsHit = 0;
     this.isDead = false;
     this.spin = 0;
     this.accelerating = false;
     this.vision = new Array(9) ;
-
+    this.showVision = false;
     this.spaceship = createSprite(gameWidth/2, gameHeight/2);
     this.spaceship.limitSpeed(maxSpeed);
     this.spaceship.friction = 0.01;
-
-    score = 0;
+    this.brain = new NeuralNet(9, 16, 4)
     this.framesAfterAsteroidCap = 600;
     this.framesAfterAsteroid = 0;
     this.framesAfterShot = 0;
+
+    this.decision = new Array(4);
+    this.seed = seed;
+    randomSeed(this.seed);
+    this.brain = new NeuralNet(9, 16, 4);
 
     this.spaceship.draw = function() {
       push();
@@ -56,6 +65,7 @@ class Player {
       this.bulletList.push(new Bullet(this.bulletStartX, this.bulletStartY, this.spaceship.rotation,
                                       this.spaceship.velocity.x, this.spaceship.velocity.y));
       this.framesAfterShot = 0;
+      this.shotsFired++;
     }
   }
 
@@ -74,18 +84,24 @@ class Player {
 
   // Called every frame by runner class
   update() {
+    if (this.isDead) {
+      return;
+    }
+
     this.checkTimers();
     this.updateMovement();
-    score++;
-    this.look();
+    this.score++;
+
+    if (this.showVision) {
+      this.look();
+    }
 
     for (let a of this.asteroidsList) {
       a.update();
       if (this.spaceship.overlap(a.asteroid)) {
         //TODO: Add collision code
         this.isDead = true;
-        isGameOver = true;
-        print("Game over!")
+        print("Game over!");
       }
     };
 
@@ -94,12 +110,12 @@ class Player {
     var yVel1;
     var yVel2;
 
-
     for (let i = 0; i < this.bulletList.length; i++) {
       for (let j = 0; j < this.asteroidsList.length; j++) {
         if (this.asteroidsList[j].asteroid.overlap(this.bulletList[i].bullet)) {
           //TODO: Add collision code
-          score += 100;
+          this.score += 100;
+          this.shotsHit++;
           if (this.asteroidsList[j].radius == bigAsteroidRadius) {
             xVel1 = this.asteroidsList[j].asteroid.velocity.x - 1;
             xVel2 = this.asteroidsList[j].asteroid.velocity.x + 1;
@@ -130,11 +146,11 @@ class Player {
       }
     }
 
-    this.show();
+    // this.show();
 
-    textSize(30);
-    fill(50, 200, 50);
-    text("Score: " + score, 10, 30);
+    // textSize(30);
+    // fill(50, 200, 50);
+    // text("Score: " + this.score, 10, 30);
   }
 
   // Manages acceleration and rotation of spaceship
@@ -192,9 +208,10 @@ class Player {
       x += dX;
       y += dY;
 
-      //If you uncomment this it'll display the vision of the spaceship
-      // stroke(255);
-      // circle(x, y, 2);
+      if (this.showVision) {
+        stroke(255);
+        circle(x, y, 2);
+      }
 
       if(this.isAsteroidHere(x, y)){
         return i;
@@ -225,9 +242,104 @@ class Player {
     }
   }
 
+  toggleVision() {
+    this.showVision = !this.showVision;
+  }
+
+  calculateFitness() {
+    this.fitness = this.score + this.score * (this.shotsHit / (this.shotsFired + 1) / 2);
+  }
+
+
+  //returns a clone of this player with the same brian
+  clone() {
+    let clone = new Player();
+    clone.brain = this.brain.clone();
+    return clone;
+  }
+
+  //returns a clone of this player with the same brain and same random seeds used so all of the asteroids will be in  the same positions
+  cloneForReplay() {
+    let clone = new Player(this.seed);
+    clone.brain = this.brain.clone();
+    // clone.seedsUsed = (ArrayList)seedsUsed.clone();
+    return clone;
+  }
+
+  crossover(parent2) {
+    let child = new Player();
+    child.brain = this.brain.crossover(parent2.brain);
+    return child;
+  }
+
+  mutate() {
+    this.brain.mutate(mutationRate);
+  }
+
+  //convert the output of the neural network to actions
+  think() {
+    //get the output of the neural network
+    this.decision = this.brain.output(this.vision);
+
+    if (this.decision[0] > 0.8) {//output 0 is boosting
+      this.accelerating = true;
+    } else {
+      this.accelerating = false;
+    }
+
+    if (this.decision[1] > 0.8) {//output 1 is turn left
+      this.spin = -turnDegrees;
+    }
+    else if (this.decision[2] > 0.8) {//output 2 is turn right
+        this.spin = turnDegrees;
+    }
+    else { //if neither then dont turn
+        this.spin = 0;
+    }
+
+    //shooting
+    if (this.decision[3]> 0.8) {//output 3 is shooting
+      this.shoot();
+    }
+  }
+
   // Displays sprite on screen
   show() {
     drawSprite(this.spaceship);
-
+    for (let a of this.asteroidsList) {
+      a.show();
+    }
+    for (let a of this.bulletList) {
+      a.show();
+    }
   }
+/*
+  //saves the player to a file by converting it to a table
+    savePlayer(playerNo, score, popID) {
+      //save the players top score and its population id
+      let playerStats = new Table();
+      playerStats.addColumn("Top Score"); //Table.addColumn
+      playerStats.addColumn("PopulationID");
+      let tr = playerStats.addRow(); // tr is TableRow
+      tr.setFloat(0, score); //TableRow.setFloat or Table.setFloat
+      tr.setInt(1, popID); //TableRow.setInt or Table.setInt
+
+      saveTable(playerStats, "data/playerStats" + playerNo + ".csv");
+
+      //save players brain
+      saveTable(this.brain.NetToTable(), "data/player" + playerNo + ".csv"); //NetToTable() must be created
+    }
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    //return the player saved in the parameter posiition
+    Player loadPlayer(playerNo) {
+
+      let load = new Player();
+      t = loadTable("data/player" + playerNo + ".csv"); //t is a Table
+      load.brain.TableToNet(t); //NeuralNet.TableToNet(Table t)
+      return load;
+    }
+*/
+
+
 }

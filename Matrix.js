@@ -1,14 +1,16 @@
-class Matrix {
-  constructor(numR, numC) { //takes integers
-    this.rows = numR;
-    this.cols = numC;
-    this.matrix = new Array(rows,cols);
-  }
+var array2D = (r, c) => [...Array(r)].map(x => Array(c));
 
-  constructor(inputMatrix ) { //takes matrix
-    this.matrix = inputMatrix;
-    cols = inputMatrix.length();
-    row = inputMatrix[0].length();
+class Matrix {
+  constructor(numR, numC, input2DArray) {
+    if (input2DArray != null) {
+      this.matrix = input2DArray;
+      this.rows = input2DArray[0].length;
+      this.cols = input2DArray.length;
+    } else {
+      this.rows = numR;
+      this.cols = numC;
+      this.matrix = array2D(this.rows, this.cols);
+    }
   }
 
   output() {
@@ -32,14 +34,14 @@ class Matrix {
   dot(n) { //matrix is n
     let result = new Matrix(this.rows, n.cols);
 
-    if (cols == n.rows) {
+    if (this.cols == n.rows) {
       for (let i = 0; i < this.rows; i++) {
-        for (let j = 0; j < this.rows; j++) {
-          this.sum = 0(float);
-          for (let k = 0; k < this.rows; k++) {
-            this.sum += this.matrix[i][k]*n.matrix[k][j];
+        for (let j = 0; j < n.cols; j++) {
+          let sum = 0;
+          for (let k = 0; k < this.cols; k++) {
+            sum += this.matrix[i][k] * n.matrix[k][j];
           }
-          result.matrix[i][j] = this.sum;
+          result.matrix[i][j] = sum;
         }
       }
     }
@@ -49,7 +51,7 @@ class Matrix {
   randomize() {
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
-        this.matrix[i][j] = ((Math.random() * 2) - 1)(int);
+        this.matrix[i][j] = (random() * 2) - 1;
       }
     }
   }
@@ -86,6 +88,7 @@ class Matrix {
     return newMatrix;
   }
 
+  //this looks wrong
   multiply(n) {
     let newMatrix = new Matrix(this.rows, this.cols);
     if (this.cols == n.cols && this.rows == n.rows) {
@@ -111,7 +114,7 @@ class Matrix {
   singleColumnMatrixFromArray(arr) { //float array
     let n = new Matrix(arr.length, 1);
     for (let i = 0; i < arr.length; i++) {
-      n.matrix[i][0] = this.arr[i];
+      n.matrix[i][0] = arr[i];
     }
     return n;
   }
@@ -128,7 +131,7 @@ class Matrix {
     let arr = new Array(this.rows*this.cols);
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
-        this.arr[j + i * this.cols] = this.matrix[i][j];
+        arr[j + i * this.cols] = this.matrix[i][j];
       }
     }
     return arr;
@@ -139,22 +142,22 @@ class Matrix {
     for (let i = 0; i < this.rows; i++) {
       n.matrix[i][0] = this.matrix[i][0];
     }
-    n.matrix[rows][0] = 1;
+    n.matrix[this.rows][0] = 1;
     return n;
   }
 
   activate() {
     let n = new Matrix(this.rows, this.cols);
-    for (int i = 0; i < this.rows; i++) {
-      for (int j = 0; j < this.cols; j++) {
-        n.matrix[i][j] = sigmoid(this.matrix[i][j]);
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        n.matrix[i][j] = this.sigmoid(this.matrix[i][j]);
       }
     }
     return n;
   }
 
   sigmoid(x) {
-    let y = (1(float)) / (1 + pow((float)Math.E, -x));
+    let y = 1 / (1 + pow(Math.E, -x));
     return y;
   }
 
@@ -183,7 +186,7 @@ class Matrix {
     //for each element in the matrix
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
-        let rand = random(1)(float);
+        let rand = random();
         if (rand < mutationRate) {//if chosen to be mutated
           this.matrix[i][j] += randomGaussian()/5;//add a random value to it(can be negative)
 
@@ -220,7 +223,7 @@ class Matrix {
   }
 
   clone() {
-    let clone = new  Matrix(this.rows, this.cols);
+    let clone = new Matrix(this.rows, this.cols);
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
         clone.matrix[i][j] = this.matrix[i][j];

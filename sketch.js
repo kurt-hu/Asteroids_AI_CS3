@@ -5,7 +5,7 @@ var gameHeight = 800;
 
 var isHumanPlaying = false;
 var showBest = false;
-var showOneFromPop = true;
+var showOneFromPop = false;
 var playingFromFile = false;
 
 var mutationRate = 0.1;
@@ -32,7 +32,7 @@ function setup() {
   humanPlayer = new Player();
   filePlayer = new Player();
 
-  theBoys = new Population(100);
+  theBoys = new Population(30);
 }
 
 // Called every frame

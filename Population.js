@@ -40,6 +40,15 @@ class Population {
 
   }
 
+  getRandomScore() {
+    for (let i = 0; i < this.players.length; i++) {
+      if (!this.players[i].isDead) {
+        return this.players[i].score;
+        break;
+      }
+    }
+  }
+
   setBestPlayer() {
     //get max fitness
     let max = 0;
@@ -92,6 +101,8 @@ class Population {
     this.players = null;
     this.players = newPlayers.slice();
 
+
+    print("Generation " + this.generation + " High Score: " + this.bestScore);
     this.generation += 1;
   }
 

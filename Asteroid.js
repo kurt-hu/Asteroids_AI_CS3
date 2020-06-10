@@ -6,6 +6,7 @@ class Asteroid {
   constructor(startingX, startingY, velX, velY, stageNum) {
     this.asteroid = createSprite(startingX, startingY);
     this.asteroid.setVelocity(velX, velY);
+    this.asteroid.limitSpeed(3);
 
     switch(stageNum) {
       //Draw function looks redundant but is called before radius can be

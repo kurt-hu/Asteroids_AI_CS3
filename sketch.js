@@ -6,6 +6,7 @@ var gameHeight = 800;
 var isHumanPlaying = false;
 var showBest = false;
 var showOneFromPop = true;
+var playingFromFile = false;
 
 var mutationRate = 0.1;
 
@@ -29,14 +30,21 @@ function setup() {
   createCanvas(gameWidth, gameHeight);
   frameRate(fps);
   humanPlayer = new Player();
+  filePlayer = new Player();
 
-  theBoys = new Population(200);
+  theBoys = new Population(100);
 }
 
 // Called every frame
 function draw() {
   background(0);
-  if (isHumanPlaying) {
+  if (playingFromFile) {
+    if (!filePlayer.isDead) {
+      filePlayer.loadPlayer(1);
+    } else {
+      playingFromFile = false;
+    }
+  } else if (isHumanPlaying) {
     if (!humanPlayer.isDead) {
       humanPlayer.update();
       humanPlayer.show();
@@ -62,7 +70,7 @@ function draw() {
 
 
   showText();
-  print(frameRate())
+  // print(frameRate())
 
   if (humanPlayer.isDead){
     textSize(32);
@@ -75,7 +83,11 @@ function draw() {
 }
 
 function showText() {
-  if (isHumanPlaying) {
+  if (playingFromFile) {
+    textSize(30);
+    fill(50, 200, 50);
+    text("Saved Player Score: " + filePlayer.score, 10, 30);
+  } else if (isHumanPlaying) {
     textSize(30);
     fill(50, 200, 50);
     text("Score: " + humanPlayer.score, 10, 30);
@@ -87,7 +99,9 @@ function showText() {
   } else {
     textSize(30);
     fill(50, 200, 50);
+    text("Score: ~" + theBoys.getRandomScore(), 10, 30);
     text("Gen: " + theBoys.generation, gameWidth - 150, 30);
+
   }
 }
 
@@ -135,6 +149,9 @@ function keyPressed() {
       frameRate(fps);
       print(fps);
     }
+    // if (key == 's') {
+    //   saveToFile(theBoys);
+    // }
 }
 
 function keyReleased() {
@@ -144,4 +161,10 @@ function keyReleased() {
         humanPlayer.spin -= -turnDegrees;
     if (keyCode == RIGHT_ARROW)
         humanPlayer.spin -= turnDegrees;
+}
+
+function saveToFile(population) {
+  if (population != null) {
+    population.bestPlayer.savePlayer(1);
+  }
 }

@@ -91,45 +91,45 @@ class NeuralNet {
 
     return clone;
   }
-/*
+
   //converts the weights matricies to a single table
   //used for storing the snakes brain in a file
-  NetToTable() {
+  netToTable() {
 
     //create table
-    Table t = new Table();
+    let t = new p5.Table();
 
 
     //convert the matricies to an array
-    float[] whiArr = whi.toArray();
-    float[] whhArr = whh.toArray();
-    float[] wohArr = woh.toArray();
+    let whiArr = this.whi.toArray();
+    let whhArr = this.whh.toArray();
+    let wohArr = this.woh.toArray();
 
     //set the amount of columns in the table
-    for ( i = 0; i< max(whiArr.length, whhArr.length, wohArr.length); i++) {
+    for (let i = 0; i < max(new Array(whiArr.length, whhArr.length, wohArr.length)); i++) {
       t.addColumn();
     }
 
     //set the first row as whi
-    TableRow tr = t.addRow();
+    let tr = t.addRow();
 
-    for ( i = 0; i< whiArr.length; i++) {
-      tr.setFloat(i, whiArr[i]);
+    for (let i = 0; i< whiArr.length; i++) {
+      tr.setNum(i, whiArr[i]);
     }
 
 
     //set the second row as whh
     tr = t.addRow();
 
-    for ( i = 0; i< whhArr.length; i++) {
-      tr.setFloat(i, whhArr[i]);
+    for (let i = 0; i< whhArr.length; i++) {
+      tr.setNum(i, whhArr[i]);
     }
 
     //set the third row as woh
     tr = t.addRow();
 
-    for ( i = 0; i< wohArr.length; i++) {
-      tr.setFloat(i, wohArr[i]);
+    for (let i = 0; i< wohArr.length; i++) {
+      tr.setNum(i, wohArr[i]);
     }
 
     //return table
@@ -139,34 +139,35 @@ class NeuralNet {
 
   //takes in table as parameter and overwrites the matricies data for this neural network
   //used to load snakes from file
-  void TableToNet(Table t) {
+  tableToNet(t) {
 
     //create arrays to tempurarily store the data for each matrix
-    float[] whiArr = new float[whi.rows * whi.cols];
-    float[] whhArr = new float[whh.rows * whh.cols];
-    float[] wohArr = new float[woh.rows * woh.cols];
+    let whiArr = new Array(this.whi.rows * this.whi.cols);
+    let whhArr = new Array(this.whh.rows * this.whh.cols);
+    let wohArr = new Array(this.woh.rows * this.woh.cols);
 
     //set the whi array as the first row of the table
-    TableRow tr = t.getRow(0);
+    let tr = t.getRow(1);
+    print(tr)
 
-    for ( i = 0; i< whiArr.length; i++) {
-      whiArr[i] = tr.getFloat(i);
+    for (let i = 0; i< whiArr.length; i++) {
+      whiArr[i] = tr.getNum(i);
     }
 
 
     //set the whh array as the second row of the table
-    tr = t.getRow(1);
+    tr = t.getRow(2);
 
-    for ( i = 0; i< whhArr.length; i++) {
-      whhArr[i] = tr.getFloat(i);
+    for (let i = 0; i< whhArr.length; i++) {
+      whhArr[i] = tr.getNum(i);
     }
 
     //set the woh array as the third row of the table
 
-    tr = t.getRow(2);
+    tr = t.getRow(3);
 
-    for ( i = 0; i< wohArr.length; i++) {
-      wohArr[i] = tr.getFloat(i);
+    for (let i = 0; i< wohArr.length; i++) {
+      wohArr[i] = tr.getNum(i);
     }
 
 
@@ -175,5 +176,5 @@ class NeuralNet {
     whh.fromArray(whhArr);
     woh.fromArray(wohArr);
   }
-  */
+
 }

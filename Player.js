@@ -79,7 +79,26 @@ class Player {
       y = int(random(2)) * gameHeight;
       x = random(gameWidth);
     }
+
     this.asteroidsList.push(new Asteroid(x, y, random(-3, 3), random(-3, 3), 1));
+  }
+
+  spawnNewDirectedAsteroid() {
+    let x;
+    let y;
+    if (random() > 0.5) {
+      x = int(random(2)) * gameWidth;
+      y = random(gameHeight);
+    } else {
+      y = int(random(2)) * gameHeight;
+      x = random(gameWidth);
+    }
+
+    //These are gonna be much greater than 3 but speed is limited by asteroid
+    let xVel = this.spaceship.position.x - x;
+    let yVel = this.spaceship.position.y - y;
+
+    this.asteroidsList.push(new Asteroid(x, y, xVel, yVel, 1));
   }
 
   // Called every frame by runner class
@@ -101,7 +120,7 @@ class Player {
       if (this.spaceship.overlap(a.asteroid)) {
         //TODO: Add collision code
         this.isDead = true;
-        print("Game over!");
+        // print("Game over!");
       }
     };
 
@@ -234,7 +253,7 @@ class Player {
     this.framesAfterAsteroid++;
 
     if (this.framesAfterAsteroid > this.framesAfterAsteroidCap) {
-      this.spawnNewRandomAsteroid();
+      this.spawnNewDirectedAsteroid();
       this.framesAfterAsteroid = 0;
       if(this.framesAfterAsteroidCap > 90) {
         this.framesAfterAsteroidCap *= .9;
@@ -305,41 +324,39 @@ class Player {
 
   // Displays sprite on screen
   show() {
-    drawSprite(this.spaceship);
-    for (let a of this.asteroidsList) {
-      a.show();
-    }
-    for (let a of this.bulletList) {
-      a.show();
+    if (!this.isDead) {
+      drawSprite(this.spaceship);
+      for (let a of this.asteroidsList) {
+        a.show();
+      }
+      for (let a of this.bulletList) {
+        a.show();
+      }
     }
   }
-/*
+
   //saves the player to a file by converting it to a table
-    savePlayer(playerNo, score, popID) {
-      //save the players top score and its population id
-      let playerStats = new Table();
-      playerStats.addColumn("Top Score"); //Table.addColumn
-      playerStats.addColumn("PopulationID");
-      let tr = playerStats.addRow(); // tr is TableRow
-      tr.setFloat(0, score); //TableRow.setFloat or Table.setFloat
-      tr.setInt(1, popID); //TableRow.setInt or Table.setInt
+  savePlayer(playerNo, score) {
+    //save the players top score and its population id
+    let playerStats = new p5.Table();
+    playerStats.addColumn("Top Score"); //Table.addColumn
+    playerStats.addColumn("PopulationID");
+    // let tr = playerStats.addRow(); // tr is TableRow
+    // tr.setNum(0, this.score); //TableRow.setFloat or Table.setFloat
+    // tr.setInt(1, popID); //TableRow.setInt or Table.setInt
 
-      saveTable(playerStats, "data/playerStats" + playerNo + ".csv");
+    // saveTable(playerStats, "data/playerStats" + playerNo + ".csv");
 
-      //save players brain
-      saveTable(this.brain.NetToTable(), "data/player" + playerNo + ".csv"); //NetToTable() must be created
-    }
-    //---------------------------------------------------------------------------------------------------------------------------------------------------------
+    //save players brain
+    saveTable(this.brain.netToTable(), "player" + playerNo + ".csv"); //NetToTable() must be created
+  }
+  //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    //return the player saved in the parameter posiition
-    Player loadPlayer(playerNo) {
-
-      let load = new Player();
-      t = loadTable("data/player" + playerNo + ".csv"); //t is a Table
-      load.brain.TableToNet(t); //NeuralNet.TableToNet(Table t)
-      return load;
-    }
-*/
-
-
+  //return the player saved in the parameter posiition
+  loadPlayer(playerNo) {
+    // let load = new Player();
+    let t = loadTable("player" + playerNo + ".csv"); //t is a Table
+    print(t)
+    this.brain.tableToNet(t); //NeuralNet.TableToNet(Table t)
+  }
 }

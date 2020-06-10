@@ -32,7 +32,7 @@ function setup() {
   humanPlayer = new Player();
   filePlayer = new Player();
 
-  theBoys = new Population(30);
+  spaceshipPop = new Population(30);
 }
 
 // Called every frame
@@ -50,21 +50,21 @@ function draw() {
       humanPlayer.show();
     }
   } else if (showBest) {
-    if (!theBoys.bestPlayer.isDead) {
-      theBoys.bestPlayer.look();
-      theBoys.bestPlayer.think();
-      theBoys.bestPlayer.update();
-      theBoys.bestPlayer.show();
+    if (!spaceshipPop.bestPlayer.isDead) {
+      spaceshipPop.bestPlayer.look();
+      spaceshipPop.bestPlayer.think();
+      spaceshipPop.bestPlayer.update();
+      spaceshipPop.bestPlayer.show();
     } else {
       showBest = false;
-      theBoys.bestPlayer = theBoys.bestPlayer.cloneForReplay();
+      spaceshipPop.bestPlayer = spaceshipPop.bestPlayer.cloneForReplay();
     }
   } else {
-    if (!theBoys.done()) {
-      theBoys.updateAlive();
+    if (!spaceshipPop.done()) {
+      spaceshipPop.updateAlive();
     } else {
-      theBoys.calculateFitness();
-      theBoys.naturalSelection();
+      spaceshipPop.calculateFitness();
+      spaceshipPop.naturalSelection();
     }
   }
 
@@ -94,13 +94,13 @@ function showText() {
   } else if (showBest) {
     textSize(30);
     fill(50, 200, 50);
-    text("Score: " + theBoys.bestPlayer.score, 10, 30);
-    text("Gen: " + theBoys.generation, gameWidth - 150, 30);
+    text("Score: " + spaceshipPop.bestPlayer.score, 10, 30);
+    text("Gen: " + spaceshipPop.generation, gameWidth - 150, 30);
   } else {
     textSize(30);
     fill(50, 200, 50);
-    text("Score: ~" + theBoys.getRandomScore(), 10, 30);
-    text("Gen: " + theBoys.generation, gameWidth - 150, 30);
+    text("Score: ~" + spaceshipPop.getRandomScore(), 10, 30);
+    text("Gen: " + spaceshipPop.generation, gameWidth - 150, 30);
 
   }
 }
@@ -133,10 +133,10 @@ function keyPressed() {
       humanPlayer = new Player();
     }
     if (key == 'b') {
-      print(theBoys.bestScore);
-      if (theBoys.bestPlayer != null) {
+      print(spaceshipPop.bestScore);
+      if (spaceshipPop.bestPlayer != null) {
         showBest = true;
-        print(theBoys.bestPlayer.brain.whh)
+        print(spaceshipPop.bestPlayer.brain.whh)
       }
     }
     if (key == '=') {
@@ -150,7 +150,7 @@ function keyPressed() {
       print(fps);
     }
     // if (key == 's') {
-    //   saveToFile(theBoys);
+    //   saveToFile(spaceshipPop);
     // }
 }
 
